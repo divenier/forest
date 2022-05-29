@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <properties>
+        <!--日志主目录-->
+        <property name="LOG_HOME">./logs/forest</property>
+        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] - %location |: %msg%n</property>
+        <!--默认滚动策略,默认为7,保存日志文件的最大个数，默认是7，大于此值会删除旧的日志文件-->
+        <property name="FILE_INDEX_MAX">30</property>
+    </properties>
+
+    <appenders>
+        <Console name="CONSOLE" target="system_out">
+            <PatternLayout pattern="${PATTERN}" />
+        </Console>
+
+        <!--用来接收sms包下面的业务日志-->
+        <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/all.log"
+                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${PATTERN}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="30 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="${FILE_INDEX_MAX}"/>
+        </RollingFile>
+
+        <RollingFile name="RollingFileAll"
+                     fileName="${LOG_HOME}/all.log"
+                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/all-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${PATTERN}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="${FILE_INDEX_MAX}"/>
+        </RollingFile>
+
+        <RollingFile name="rollingFileAccess" fileName="${LOG_HOME}/access.log"
+                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/access-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${PATTERN}" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="${FILE_INDEX_MAX}"/>
+        </RollingFile>
+
+        <RollingFile name="MySQL"
+                     fileName="${LOG_HOME}/mysql.log"
+                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/mysql-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="${FILE_INDEX_MAX}"/>
+        </RollingFile>
+
+    </appenders>
+    <loggers>
+        <root level="INFO">
+            <appenderref ref="CONSOLE" />
+            <appenderref ref="RollingFileAll" />
+        </root>
+
+        <logger name="org.apache.kafka" level="INFO" />
+        <logger name="org.springframework" level="INFO" />
+        <logger name="com.ctrip.framework.apollo" level="INFO" />
+        <logger name="com.netflix.discovery" level="INFO" />
+        <!--<logger name="org.apache.http" level="DEBUG" />-->
+        <logger name="org.mongodb" level="INFO" />
+        <logger name="org.quartz" level="INFO" />
+        <logger name="springfox.documentation" level="INFO" />
+        <logger name="com.zaxxer.hikari.pool.HikariPool.logPoolState" level="INFO" />
+<!--        <Logger name="com.nebula.sms.**" level="INFO">-->
+<!--            <appenderref ref="RollingFileInfo" />-->
+<!--        </Logger>-->
+        <Logger name="p6spy" level="INFO">
+            <appenderref ref="MySQL" />
+        </Logger>
+        <Logger name="apiAccess" level="INFO">
+            <appenderref ref="rollingFileAccess" />
+        </Logger>
+    </loggers>
+</configuration>
